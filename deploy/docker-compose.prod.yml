@@ -1,0 +1,51 @@
+# ============================================
+# AI Interview Platform - Production Override
+# 生产环境 Docker Compose 配置覆盖
+# ============================================
+# 使用方式:
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml --env-file deploy/env.prod up -d
+#
+# 该文件覆盖 base docker-compose.yml 中的开发期配置，
+# 启用生产环境安全设置（如 Redis 密码、AI 端点修复）。
+# ============================================
+
+services:
+  # =========================================
+  # Redis - 生产环境启用密码认证
+  # =========================================
+  redis:
+    image: redis:7
+    container_name: interview-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-123456}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-123456}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # =========================================
+  # 后端应用 - 生产环境特殊配置
+  # =========================================
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: interview-app
+    environment:
+      # === AI 模型配置 ===
+      AI_BAILIAN_API_KEY: ${AI_BAILIAN_API_KEY}
+      AI_MODEL: ${AI_MODEL:-deepseek-chat}
+
+      # === Redis 密码 (与上方 redis 服务保持一致) ===
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-123456}
+
+      # === 修复 Spring AI 2.0.0-M1 base-url 双 /v1 问题 ===
+      # Spring AI 会自动拼接 /v1/chat/completions，
+      # 所以 base-url 不能带 /v1 后缀，否则变成 /v1/v1/chat/completions → 404
+      SPRING_AI_OPENAI_BASE_URL: https://api.deepseek.com
+    ports:
+      - "8080:8080"
