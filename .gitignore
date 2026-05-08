@@ -9,6 +9,7 @@ build
 /app/bin
 # Environment variables
 .env
+deploy/env.prod
 # IDEA code analysis
 qodana.yaml
 

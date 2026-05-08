@@ -32,6 +32,7 @@ services:
   # =========================================
   frontend:
     build: ./frontend
+    image: ghcr.io/yunyucn/amz-agent-yunyu/frontend:latest
     container_name: interview-frontend
     ports:
       - "80:80"
@@ -50,6 +51,7 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    image: ghcr.io/yunyucn/amz-agent-yunyu/app:latest
     container_name: interview-app
     environment:
       # === AI 模型配置 ===
