@@ -28,23 +28,6 @@ services:
       retries: 5
 
   # =========================================
-  # 前端 - 生产环境启用 HTTPS
-  # =========================================
-  frontend:
-    build: ./frontend
-    image: ghcr.io/yunyucn/amz-agent-yunyu/frontend:latest
-    container_name: interview-frontend
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      # SSL 证书（Let's Encrypt）
-      - /root/ssl-cert/live/edu.zhangyunyu.cn/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
-      - /root/ssl-cert/live/edu.zhangyunyu.cn/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
-      # Let's Encrypt 验证目录（用于证书续期）
-      - /var/www/certbot:/var/www/certbot:ro
-
-  # =========================================
   # 后端应用 - 生产环境特殊配置
   # =========================================
   app:
