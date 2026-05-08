@@ -47,7 +47,13 @@ jobs:
   # ============================================================
   backend-build-test:
     needs: changes-check
-    if: needs.changes-check.outputs.backend == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+        (needs.changes-check.outputs.backend == 'true' ||
+         needs.changes-check.outputs.frontend == 'true')) ||
+      (github.event_name == 'pull_request' &&
+        needs.changes-check.outputs.backend == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -125,7 +131,13 @@ jobs:
   # ============================================================
   frontend-build:
     needs: changes-check
-    if: needs.changes-check.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+        (needs.changes-check.outputs.backend == 'true' ||
+         needs.changes-check.outputs.frontend == 'true')) ||
+      (github.event_name == 'pull_request' &&
+        needs.changes-check.outputs.frontend == 'true')
     runs-on: ubuntu-latest
     defaults:
       run:
