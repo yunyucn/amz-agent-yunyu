@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * AI Interview Platform - Main Application
- * 智能AI面试官平台 - 主启动类
+ * AI 智能面试官平台 - 主启动类
  */
 @SpringBootApplication
 public class App {
