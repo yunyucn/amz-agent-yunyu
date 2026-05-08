@@ -45,8 +45,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' &&
-        (needs.changes-check.outputs.backend == 'true' ||
-         needs.changes-check.outputs.frontend == 'true')) ||
+        needs.changes-check.outputs.backend == 'true') ||
       (github.event_name == 'pull_request' &&
         needs.changes-check.outputs.backend == 'true')
     runs-on: ubuntu-latest
@@ -129,8 +128,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' &&
-        (needs.changes-check.outputs.backend == 'true' ||
-         needs.changes-check.outputs.frontend == 'true')) ||
+        needs.changes-check.outputs.frontend == 'true') ||
       (github.event_name == 'pull_request' &&
         needs.changes-check.outputs.frontend == 'true')
     runs-on: ubuntu-latest
