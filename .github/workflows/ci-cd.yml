@@ -236,16 +236,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-
       - name: Deploy to production
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -253,7 +243,14 @@ jobs:
           GHCR_USER: ${{ github.repository_owner }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
-          ssh ${DEPLOY_USER}@${DEPLOY_HOST} "
+          # 创建 SSH 密钥文件
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          ssh -o StrictHostKeyChecking=accept-new \
+            -i ~/.ssh/deploy_key \
+            ${DEPLOY_USER}@${DEPLOY_HOST} "
             set -e
 
             cd /opt/amz-agent-yunyu
@@ -269,25 +266,25 @@ jobs:
             # 如果没有任何 env 文件，从示例模板创建
             [ -f deploy/env.prod ] || cp deploy/env.prod.example deploy/env.prod
 
-            # 2. 登录容器仓库
+            # 4. 登录容器仓库
             echo '${GHCR_TOKEN}' | docker login ${REGISTRY:-ghcr.io} -u ${GHCR_USER} --password-stdin
 
-            # 3. 预先拉取新镜像
+            # 5. 拉取新镜像
             docker compose -f docker-compose.yml \
               -f deploy/docker-compose.prod.yml \
               --env-file deploy/env.prod \
               pull app frontend
 
-            # 4. 重新创建已变更的服务
+            # 6. 重启已变更的服务
             docker compose -f docker-compose.yml \
               -f deploy/docker-compose.prod.yml \
               --env-file deploy/env.prod \
               up -d --no-build --remove-orphans
 
-            # 5. 清理旧镜像
+            # 7. 清理旧镜像
             docker image prune -af
 
-            # 6. 验证服务健康
+            # 8. 验证服务健康
             sleep 5
             curl -sf http://localhost:8080/actuator/health && echo 'Backend healthy' || echo 'Backend health check failed'
           "
