@@ -10,10 +10,9 @@ import org.springframework.context.annotation.Primary;
 /**
  * AI 模型配置
  * <p>
- * 手动创建 EmbeddingModel Bean 并指定阿里云百炼 URL，
- * 绕开 Spring AI 2.0.0-M1 自动配置 Bug（OpenAiEmbeddingModel 忽略
- * spring.ai.openai.embedding.base-url，始终回退到全局 base-url DeepSeek，
- * 导致 /v1/embeddings 返回 404）。
+ * 手动创建 EmbeddingModel Bean 并指定阿里云百炼 URL。
+ * OpenAiApi 在 baseUrl 后固定追加 /v1/embeddings，因此 baseUrl 末尾不含 /v1，
+ * 避免双 /v1 导致 404。
  */
 @Configuration
 public class AiConfig {
@@ -26,7 +25,7 @@ public class AiConfig {
     public OpenAiEmbeddingModel embeddingModel() {
         return new OpenAiEmbeddingModel(
                 OpenAiApi.builder()
-                        .baseUrl("https://dashscope.aliyuncs.com/compatible-mode/v1")
+                        .baseUrl("https://dashscope.aliyuncs.com/compatible-mode")
                         .apiKey(embeddingApiKey)
                         .build()
         );
