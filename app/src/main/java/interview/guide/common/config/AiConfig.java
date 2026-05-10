@@ -1,6 +1,8 @@
 package interview.guide.common.config;
 
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +29,10 @@ public class AiConfig {
                 OpenAiApi.builder()
                         .baseUrl("https://dashscope.aliyuncs.com/compatible-mode")
                         .apiKey(embeddingApiKey)
+                        .build(),
+                MetadataMode.EMBED,
+                OpenAiEmbeddingOptions.builder()
+                        .model("text-embedding-v4")
                         .build()
         );
     }
