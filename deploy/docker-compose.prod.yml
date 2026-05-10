@@ -39,6 +39,7 @@ services:
     environment:
       # === AI 模型配置 ===
       AI_BAILIAN_API_KEY: ${AI_BAILIAN_API_KEY}
+      AI_EMBEDDING_API_KEY: ${AI_EMBEDDING_API_KEY}
       AI_MODEL: ${AI_MODEL:-deepseek-chat}
 
       # === Redis 密码 (与上方 redis 服务保持一致) ===

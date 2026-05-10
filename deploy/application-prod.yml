@@ -21,12 +21,16 @@ spring:
           # 生产模型
           model: deepseek-chat
       embedding:
+        # 阿里云百炼兼容 OpenAI 接口，与聊天模型独立
+        base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+        # 使用独立的阿里云百炼 API Key
+        api-key: ${AI_EMBEDDING_API_KEY}
         options:
-          # DeepSeek Embedding 模型 (非 text-embedding-v3)
-          model: deepseek-embedding
+          # 阿里云百炼向量模型 (text-embedding-v4)
+          model: text-embedding-v4
     vectorstore:
       pgvector:
-        # deepseek-embedding 输出的向量维度是 1792
-        dimensions: 1792
+        # text-embedding-v4 输出的向量维度是 1024
+        dimensions: 1024
         # 生产环境建议手动管理 schema
         initialize-schema: false
